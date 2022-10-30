@@ -1,15 +1,17 @@
 import java.time.LocalDateTime;
 
 public class Task {
+    enum Type {PERSONAL, WORKING}
+
     private String header;
     private String description;
-    private final String type;
+    private final Type type;
     private final int taskId;
-    static int id = 0;
-    LocalDateTime localDateTime;
+    private static int id = 0;
+    private LocalDateTime localDateTime;
     private final String repeatability;
 
-    public Task(String header, String description, String type, String repeatability, LocalDateTime localDateTime) {
+    public Task(String header, String description, Type type, String repeatability, LocalDateTime localDateTime) {
         taskId = id++;
         this.localDateTime = localDateTime;
         if (header != null) {
@@ -34,6 +36,10 @@ public class Task {
         return repeatability;
     }
 
+    public LocalDateTime getLocalDateTime() {
+        return localDateTime;
+    }
+
     public int getTaskId() {
         return taskId;
     }
@@ -41,12 +47,10 @@ public class Task {
     @Override
     public String toString() {
         return "Task{" +
-                "header='" + header + '\'' +
+                "typeTask=" + type +
+                ", header='" + header + '\'' +
                 ", description='" + description + '\'' +
-                ", type='" + type + '\'' +
-                ", taskId=" + taskId +
                 ", localDateTime=" + localDateTime +
-                ", repeatability='" + repeatability + '\'' +
                 '}';
     }
 }

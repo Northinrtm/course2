@@ -1,9 +1,11 @@
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
+        System.out.println(LocalDate.of(2000,12,12).isBefore(LocalDate.of(2000,12,12)));
         try (Scanner scanner = new Scanner(System.in)) {
             label:
             while (true) {
@@ -39,32 +41,32 @@ public class Main {
         System.out.print("Введите описание задачи: ");
         String taskDescription = scanner.next();
         System.out.println("Личная или рабочая?: ");
-        String taskType = inputTaskType(scanner);
+        Task.Type taskType = inputTaskType(scanner);
         System.out.println("Как часто необходима решать задачу: ");
         String taskRepeatability = inputTaskRepeatability(scanner);
         System.out.println("Ведите дату задачи в формате YYYY-MM-DD: ");
         String date = scanner.next();
         System.out.println("Введите время задачи в формате HH:MM");
         date = date + "T" + scanner.next() + ":00";
-        LocalDateTime localDateTime = null;
+        LocalDateTime localDateTime;
         try {
             localDateTime = LocalDateTime.parse(date);
+            ServiceTask.addTask(new Task(taskName, taskDescription, taskType, taskRepeatability, localDateTime));
         } catch (DateTimeParseException e) {
-            throw new RuntimeException("не правильно ввели дату или время");
+            System.out.println("не правильно ввели дату или время");
         }
-        ServiceTask.addTask(new Task(taskName, taskDescription, taskType, taskRepeatability, localDateTime));
     }
 
-    private static String inputTaskType(Scanner scanner) {
+    private static Task.Type inputTaskType(Scanner scanner) {
         while (true) {
             System.out.println("Выберите 1 если личная, 2 если рабочая: ");
             if (scanner.hasNext()) {
                 int choice = scanner.nextInt();
                 switch (choice) {
                     case 1:
-                        return "личная";
+                        return Task.Type.PERSONAL;
                     case 2:
-                        return "рабочая";
+                        return Task.Type.WORKING;
                 }
             } else {
                 scanner.nextInt();
@@ -102,14 +104,13 @@ public class Main {
         while (true) {
             System.out.println("Напишите нужный день в формате YYYY-MM-DD: ");
             String s = scanner.next();
-            s += "T00:00:00";
-            LocalDateTime localDateTime;
+            LocalDate localDate;
             try {
-                localDateTime = LocalDateTime.parse(s);
+                localDate = LocalDate.parse(s);
+                ServiceTask.printTasksForTheDay(localDate);
             } catch (DateTimeParseException e) {
-                throw new RuntimeException("не правильно ввели дату");
+                System.out.println("не правильно ввели дату");
             }
-            ServiceTask.printTasksForTheDay(localDateTime);
         }
     }
 
