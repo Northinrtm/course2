@@ -9,21 +9,13 @@ public class Task {
     private final int taskId;
     private static int id = 0;
     private LocalDateTime localDateTime;
-    private final String repeatability;
+    private Repeatability repeatability;
 
-    public Task(String header, String description, Type type, String repeatability, LocalDateTime localDateTime) {
+    public Task(String header, String description, Type type, Repeatability repeatability, LocalDateTime localDateTime) {
         taskId = id++;
         this.localDateTime = localDateTime;
-        if (header != null) {
-            this.header = header;
-        } else {
-            throw new RuntimeException("не указан Заголовок");
-        }
-        if (description != null) {
-            this.description = description;
-        } else {
-            throw new RuntimeException("не указано Описание");
-        }
+        this.header = header;
+        this.description = description;
         this.type = type;
         this.repeatability = repeatability;
     }
@@ -32,16 +24,16 @@ public class Task {
         return header;
     }
 
-    public String getRepeatability() {
-        return repeatability;
-    }
-
     public LocalDateTime getLocalDateTime() {
         return localDateTime;
     }
 
     public int getTaskId() {
         return taskId;
+    }
+
+    public Repeatability getRepeatability() {
+        return repeatability;
     }
 
     @Override

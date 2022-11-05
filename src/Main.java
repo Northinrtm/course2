@@ -1,11 +1,10 @@
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeParseException;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println(LocalDate.of(2000,12,12).isBefore(LocalDate.of(2000,12,12)));
         try (Scanner scanner = new Scanner(System.in)) {
             label:
             while (true) {
@@ -32,10 +31,12 @@ public class Main {
                     System.out.println("Выберите пункт меню из списка!");
                 }
             }
+        } catch (MyOriginalExceptionName e) {
+            throw new RuntimeException(e);
         }
     }
 
-    private static void inputTask(Scanner scanner) {
+    private static void inputTask(Scanner scanner) throws MyOriginalExceptionName {
         System.out.print("Введите название задачи: ");
         String taskName = scanner.next();
         System.out.print("Введите описание задачи: ");
@@ -43,18 +44,20 @@ public class Main {
         System.out.println("Личная или рабочая?: ");
         Task.Type taskType = inputTaskType(scanner);
         System.out.println("Как часто необходима решать задачу: ");
-        String taskRepeatability = inputTaskRepeatability(scanner);
+        Repeatability taskRepeatability = inputTaskRepeatability(scanner);
         System.out.println("Ведите дату задачи в формате YYYY-MM-DD: ");
         String date = scanner.next();
+        if(!Pattern.matches("^\\d{4}-\\d{2}-\\d{2}$", date )){
+            throw new MyOriginalExceptionName();
+        }
         System.out.println("Введите время задачи в формате HH:MM");
         date = date + "T" + scanner.next() + ":00";
-        LocalDateTime localDateTime;
-        try {
-            localDateTime = LocalDateTime.parse(date);
-            ServiceTask.addTask(new Task(taskName, taskDescription, taskType, taskRepeatability, localDateTime));
-        } catch (DateTimeParseException e) {
-            System.out.println("не правильно ввели дату или время");
+        if(!Pattern.matches("^\\d{2}:\\d{2}$", date )){
+            throw new MyOriginalExceptionName();
         }
+        LocalDateTime localDateTime;
+        localDateTime = LocalDateTime.parse(date);
+        ServiceTask.addTask(new Task(taskName, taskDescription, taskType, taskRepeatability, localDateTime));
     }
 
     private static Task.Type inputTaskType(Scanner scanner) {
@@ -75,22 +78,22 @@ public class Main {
         }
     }
 
-    private static String inputTaskRepeatability(Scanner scanner) {
+    private static Repeatability inputTaskRepeatability(Scanner scanner) {
         while (true) {
             System.out.println("Выбирете 1 если однократная, 2 если ежедневная, 3 если еженедельная, 4 если ежемесячная, 5 если ежегодная: ");
             if (scanner.hasNext()) {
                 int choice = scanner.nextInt();
                 switch (choice) {
                     case 1:
-                        return "однократная";
+                        return new Single();
                     case 2:
-                        return "ежедневная";
+                        return new Daily();
                     case 3:
-                        return "еженедельная";
+                        return new Weekly();
                     case 4:
-                        return "ежемесячная";
+                        return new Monthly();
                     case 5:
-                        return "ежегодная";
+                        return new Yearly();
                 }
             } else {
                 scanner.nextInt();
@@ -101,17 +104,11 @@ public class Main {
 
 
     private static void printTasksForTheDay(Scanner scanner) {
-        while (true) {
-            System.out.println("Напишите нужный день в формате YYYY-MM-DD: ");
-            String s = scanner.next();
-            LocalDate localDate;
-            try {
-                localDate = LocalDate.parse(s);
-                ServiceTask.printTasksForTheDay(localDate);
-            } catch (DateTimeParseException e) {
-                System.out.println("не правильно ввели дату");
-            }
-        }
+        System.out.println("Напишите нужный день в формате YYYY-MM-DD: ");
+        String s = scanner.next();
+        LocalDate localDate;
+        localDate = LocalDate.parse(s);
+        ServiceTask.printTasksForTheDay(localDate);
     }
 
     private static void printMenu() {
